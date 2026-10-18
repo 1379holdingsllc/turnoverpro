@@ -84,6 +84,18 @@ details.more[open] summary:before{content:"–"}details.more[open]{padding-botto
 .panel .btn{width:100%;font-size:1.12rem;min-height:58px}
 .after{font-size:.9rem;color:var(--m);margin:12px 0 0;text-align:center}
 .panel.list{background:#fbfaf7}
+/* contact preference */
+fieldset.rg{border:0;padding:0;margin:0 0 18px;min-width:0}fieldset.rg legend{font-weight:700;padding:0;margin:0 0 8px;font-size:1rem}
+fieldset.rg .opts{display:flex;flex-wrap:wrap;gap:8px}
+fieldset.rg label{display:inline-flex;align-items:center;gap:8px;border:1.5px solid #b9b6af;border-radius:999px;padding:8px 16px;min-height:44px;cursor:pointer;font-weight:600;font-size:.97rem}
+fieldset.rg input{width:20px;height:20px;min-height:0;margin:0;accent-color:var(--ad)}
+fieldset.rg label:has(input:checked){border-color:var(--ad);background:color-mix(in srgb,var(--a) 14%,#fff)}
+/* faq */
+.faq{max-width:820px}.faq details{background:#fff;border:1px solid var(--line);border-radius:var(--r);margin:0 0 12px;padding:0 20px}
+.faq summary{cursor:pointer;font-weight:700;font-size:1.06rem;padding:18px 0;min-height:56px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";font-size:1.5rem;line-height:1;color:var(--ad);flex:none}
+.faq details[open] summary:after{content:"\2013"}.faq details p{margin:0 0 18px;color:var(--m)}
+.faq .more-q{margin-top:20px;color:var(--m)}
 /* footer */
 footer{background:#111316;color:#cfcfcf;padding:44px 0 110px;font-size:.95rem}
 @media(min-width:760px){footer{padding-bottom:44px}}
