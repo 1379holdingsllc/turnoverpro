@@ -212,6 +212,9 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
       var first=null;els.forEach(function(el){if(!check(el)&&!first)first=el});
       if(first){ev.preventDefault();var d=first.closest('details');if(d)d.open=true;first.focus();return}
       var b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Sending…'}
+      // 2026-10-26: keep a short recap (no contact details) in this tab so the thanks page can offer a prefilled text
+      try{var nd=form.querySelector('select[name=need]');if(nd&&nd.value){var g=function(q){var x=form.querySelector(q);return x?x.value.trim():''},fx=form.querySelector('input[name=flexible]');
+        sessionStorage.setItem('recap1379:'+(location.pathname.split('/')[1]||'site'),JSON.stringify({n:nd.value,d:g('input[name=date]'),f:!!(fx&&fx.checked),l:g('input[name=location]')}))}}catch(x){}
     });
   });
   // hide sticky bar while a form is on screen
