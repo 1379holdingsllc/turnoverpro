@@ -113,6 +113,8 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
 @media(min-width:760px){.mbar{display:none}}
 .chips{display:none;flex-wrap:wrap;gap:8px;margin:8px 0 2px}.chips.on{display:flex}.chips button{min-height:44px;padding:8px 14px;border:1.5px solid var(--line);border-radius:999px;background:#fff;color:var(--t);font:inherit;font-size:.92rem;font-weight:600;cursor:pointer}.chips button[aria-pressed=true]{border-color:var(--ad);background:var(--bg);box-shadow:inset 0 0 0 1px var(--ad)}.chips button:focus-visible{outline:3px solid var(--ad);outline-offset:2px}.chipnote{display:block;color:var(--m);font-size:.85rem;margin-top:4px}
 .again{border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;margin:0 0 14px;background:var(--bg)}.again p{margin:0 0 8px}.again .ag-t{font-weight:700}.again button{min-height:44px;padding:8px 16px;border:1.5px solid var(--ad);border-radius:999px;background:#fff;color:var(--t);font:inherit;font-weight:700;cursor:pointer}.again button:focus-visible{outline:3px solid var(--ad);outline-offset:2px}.again .ag-m{margin:8px 0 0;color:var(--m);font-size:.9rem}.again .ag-m:empty{display:none}
+.errsum{border:1.5px solid #b42318;background:#fff8f7;border-radius:12px;padding:12px 14px;margin:14px 0 0}.errsum p{margin:0 0 8px;font-weight:700;color:#b42318}.errsum ul{margin:0;padding:0;list-style:none;display:grid;gap:6px}.errsum button{min-height:44px;width:100%;text-align:left;padding:8px 12px;border:1px solid #f1c4bf;border-radius:10px;background:#fff;color:var(--t);font:inherit;cursor:pointer}.errsum button:focus-visible{outline:3px solid #b42318;outline-offset:2px}
+.drafted{border:1.5px dashed var(--line);border-radius:12px;padding:10px 14px;margin:0 0 14px;background:var(--bg);font-size:.95rem}.drafted button{min-height:44px;padding:6px 14px;margin-top:4px;border:1.5px solid var(--ad);border-radius:999px;background:#fff;color:var(--t);font:inherit;font-weight:700;cursor:pointer}.drafted button:focus-visible{outline:3px solid var(--ad);outline-offset:2px}
 .newnote{margin:22px 0 0;padding:14px 18px;border-left:4px solid var(--a);background:#fff;border-radius:0 10px 10px 0;font-size:.97rem;color:var(--m);max-width:46em}.newnote strong{color:var(--t)}
 /* thanks */
 .thx{min-height:70vh;display:grid;place-items:center;text-align:center;padding:60px 20px;background:var(--bg)}
@@ -143,7 +145,7 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
     var v=el.validity;
     if(v.valueMissing)return el.tagName==='SELECT'?'Please choose an option.':'This field is required.';
     if(v.typeMismatch&&el.type==='email')return 'Please enter a valid email, like name@example.com.';
-    if(v.patternMismatch&&el.type==='tel')return 'Please enter a phone number with area code.';
+    if(v.patternMismatch&&el.type==='tel')return 'Please enter a 10-digit phone number, including the area code.';
     if(v.rangeUnderflow)return 'Please pick today or a later date.';
     return el.validationMessage||'Please check this field.';
   }
@@ -236,9 +238,48 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
       if(multi)t.addEventListener('input',function(){var ps=t.value.split(',').map(function(x){return x.trim()});g.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',ps.indexOf(x.getAttribute('data-v'))>=0?'true':'false')})});
       t.addEventListener('input',function(){if(!t.value)g.querySelectorAll('button:not([data-flex])').forEach(function(x){x.setAttribute('aria-pressed','false')})});
     });
+    // 2026-10-31: keep an unsent draft in this tab (session storage only) so switching apps or a reload doesn't wipe it
+    (function(){
+      if(form.querySelector('input[name=job_id],input[name=pro_id]'))return;
+      var ss=null;try{ss=window.sessionStorage;ss.setItem('t1379','1');ss.removeItem('t1379')}catch(x){return}
+      var f0=form.querySelector('.f [id]');if(!f0)return;
+      var DK='draft1379:'+location.pathname+':'+f0.id,tm=null;form.setAttribute('data-dk',DK);
+      function flds(){return [].filter.call(form.elements,function(el){return el.name&&el.name.charAt(0)!=='_'&&['hidden','file','submit','button'].indexOf(el.type)<0})}
+      function save(){if(form._sent)return;var o={},any=false;flds().forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){if(el.checked)o[el.name+'='+el.value]=1}else if(el.value.trim()){o[el.name]=el.value;any=true}});
+        try{if(any)ss.setItem(DK,JSON.stringify(o));else ss.removeItem(DK)}catch(x){}}
+      function later(){clearTimeout(tm);tm=setTimeout(save,300)}
+      var d=null;try{d=JSON.parse(ss.getItem(DK)||'null')}catch(x){}
+      if(d){var got=[];
+        flds().forEach(function(el){
+          if(el.type==='checkbox'||el.type==='radio'){var c=!!d[el.name+'='+el.value];if(el.checked!==c){el.checked=c;el.dispatchEvent(new Event('change'))}}
+          else if(d[el.name]!=null&&!el.value){el.value=d[el.name];if(el.value){got.push(el);el.dispatchEvent(new Event('input'));if(el.tagName==='SELECT')el.dispatchEvent(new Event('change'));var dt=el.closest('details');if(dt)dt.open=true}}
+        });
+        if(got.length){var nt=document.createElement('p');nt.className='drafted';nt.textContent='We kept what you typed earlier in this tab. It hasn\u2019t been sent yet.';
+          var cb=document.createElement('button');cb.type='button';cb.textContent='Start over';
+          cb.addEventListener('click',function(){try{ss.removeItem(DK)}catch(x){}got.forEach(function(el){el.value='';el.dispatchEvent(new Event('input'));var f=el.closest('.f');if(f)f.classList.remove('ok','bad')});
+            flds().forEach(function(el){if((el.type==='checkbox'||el.type==='radio')&&el.checked!==el.defaultChecked){el.checked=el.defaultChecked;el.dispatchEvent(new Event('change'))}});
+            nt.remove();if(got[0])got[0].focus()});
+          nt.appendChild(document.createTextNode(' '));nt.appendChild(cb);
+          var rk=form.querySelector('.reqkey');form.insertBefore(nt,rk&&rk.parentNode===form?rk:form.firstChild)}
+      }
+      form.addEventListener('input',later);form.addEventListener('change',later);window.addEventListener('pagehide',save);
+    })();
+    // 2026-10-31: on a failed send, list what still needs fixing right above the send button (tap an item to jump to it)
+    var sum=document.createElement('div');sum.className='errsum';sum.hidden=true;
+    var sbtn=form.querySelector('button[type=submit]');if(sbtn)sbtn.parentNode.insertBefore(sum,sbtn);
+    function lbl(el){var l=el.id?form.querySelector('label[for="'+el.id+'"]'):null;if(!l)return '';var c=l.cloneNode(true);c.querySelectorAll('.star,.opt').forEach(function(x){x.remove()});return c.textContent.trim()}
+    function showSum(){var bad=[];els.forEach(function(el){var f=el.closest('.f');if(f&&f.classList.contains('bad'))bad.push(el)});
+      sum.innerHTML='';if(!bad.length){sum.hidden=true;return}
+      var hp=document.createElement('p');hp.textContent=bad.length===1?'One thing to fix before sending:':bad.length+' things to fix before sending:';sum.appendChild(hp);
+      var ul=document.createElement('ul');
+      bad.forEach(function(el){var li=document.createElement('li'),b=document.createElement('button'),t=lbl(el);b.type='button';b.textContent=(t?t+': ':'')+msg(el);
+        b.addEventListener('click',function(){var dt=el.closest('details');if(dt)dt.open=true;el.focus();if(el.scrollIntoView)el.scrollIntoView({block:'center'})});li.appendChild(b);ul.appendChild(li)});
+      sum.appendChild(ul);sum.hidden=false}
+    els.forEach(function(el){['input','change','blur'].forEach(function(t){el.addEventListener(t,function(){if(!sum.hidden)setTimeout(showSum,0)})})});
     form.addEventListener('submit',function(ev){
       var first=null;els.forEach(function(el){if(!check(el)&&!first)first=el});
-      if(first){ev.preventDefault();var d=first.closest('details');if(d)d.open=true;first.focus();return}
+      if(first){ev.preventDefault();var d=first.closest('details');if(d)d.open=true;first.focus();showSum();return}
+      sum.hidden=true;form._sent=true;try{var dk=form.getAttribute('data-dk');if(dk)sessionStorage.removeItem(dk)}catch(x){}
       var b=form.querySelector('button[type=submit]');if(b){b.disabled=true;b.textContent='Sending…'}
       // 2026-10-26: keep a short recap (no contact details) in this tab so the thanks page can offer a prefilled text
       try{var nd=form.querySelector('select[name=need]');if(nd&&nd.value){var g=function(q){var x=form.querySelector(q);return x?x.value.trim():''},fx=form.querySelector('input[name=flexible]');
