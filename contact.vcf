@@ -2,7 +2,7 @@ BEGIN:VCARD
 VERSION:3.0
 FN:TurnoverPro
 ORG:TurnoverPro (1379 Holdings LLC)
-TEL;TYPE=WORK,VOICE,MSG:+14702796694
+EMAIL;TYPE=INTERNET,WORK:1379holdingsllc@gmail.com
 URL:https://1379holdingsllc.github.io/turnoverpro/
-NOTE:Texts and calls about your TurnoverPro request come from this number.
+NOTE:Emails about your TurnoverPro request come from this address.
 END:VCARD
