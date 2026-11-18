@@ -165,6 +165,30 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
     form.addEventListener('keydown',function(ev){var el=ev.target;if(ev.key!=='Enter'||ev.isComposing||el.tagName!=='INPUT')return;
       var fs=fields(),i=fs.indexOf(el);if(i<0||i>=fs.length-1)return;ev.preventDefault();var n=fs[i+1];n.focus();
       if(n.tagName==='INPUT'||n.tagName==='TEXTAREA'){try{n.scrollIntoView({block:'center'})}catch(x){}}});
+    // 2026-11-18 progress cue above the send button
+    (function(){
+      var sb=form.querySelector('button[type=submit]');if(!sb)return;
+      var pr=document.createElement('div');pr.className='prog';pr.hidden=true;
+      var bar=document.createElement('span');bar.className='pbar';var fill=document.createElement('i');bar.appendChild(fill);
+      var tx=document.createElement('button');tx.type='button';tx.className='ptx';
+      var sr=document.createElement('span');sr.className='psr';sr.setAttribute('aria-live','polite');
+      pr.appendChild(bar);pr.appendChild(tx);pr.appendChild(sr);sb.parentNode.insertBefore(pr,sb);
+      function req(){var seen={},out=[];[].forEach.call(form.querySelectorAll('[required]'),function(el){if(el.disabled||el.name==='_honey'||el.type==='hidden')return;var dt=el.closest('details');if(!dt&&el.offsetParent===null)return;
+        if(el.type==='radio'||el.type==='checkbox'){if(seen[el.name])return;seen[el.name]=1}out.push(el)});return out}
+      function ok(el){if(el.type==='radio'){return !!form.querySelector('input[type=radio][name="'+el.name+'"]:checked')}try{return el.checkValidity()}catch(x){return !!el.value}}
+      var started=false,last=-1,tm=null;
+      function upd(){if(!started||form._sent)return;var r=req();if(!r.length){pr.hidden=true;return}
+        var miss=r.filter(function(el){return !ok(el)}),done=r.length-miss.length;pr.hidden=false;
+        fill.style.width=Math.round(100*done/r.length)+'%';pr.classList.toggle('done',!miss.length);
+        tx.textContent=miss.length?(miss.length===1?'Almost done \u2013 1 required field left':miss.length+' required fields left')+' (tap to jump there)':'\u2713 All required fields done \u2013 ready to send';
+        tx.disabled=!miss.length;tx._next=miss[0]||null;
+        if(!miss.length&&last!==0)sr.textContent='All required fields done. Ready to send.';else if(miss.length)sr.textContent='';last=miss.length}
+      tx.addEventListener('click',function(){var el=tx._next;if(!el)return;var dt=el.closest('details');if(dt)dt.open=true;el.focus();try{el.scrollIntoView({block:'center'})}catch(x){}});
+      function later(){started=true;clearTimeout(tm);tm=setTimeout(upd,250)}
+      form.addEventListener('input',later);form.addEventListener('change',later);
+      setTimeout(function(){if(req().some(function(el){return el.value&&el.type!=='radio'&&el.type!=='checkbox'&&el.tagName!=='SELECT'}))later()},600);
+    })();
   });
+  var ps=document.createElement('style');ps.textContent='.prog{margin:14px 0 8px}.prog .pbar{display:block;height:6px;border-radius:99px;background:#e6e8ec;overflow:hidden}.prog .pbar i{display:block;height:100%;width:0;background:#d97706;transition:width .3s}.prog.done .pbar i{background:#15803d}.prog .ptx{display:block;width:100%;min-height:40px;margin-top:4px;padding:6px 0;border:0;background:none;text-align:left;font:inherit;font-size:.93rem;font-weight:700;color:#92400e;cursor:pointer;text-decoration:underline}.prog.done .ptx{color:#15803d;text-decoration:none;cursor:default}.prog .psr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}';document.head.appendChild(ps);
 })();
 </script><script data-goatcounter="https://turnoverpro1379.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script></body></html>
