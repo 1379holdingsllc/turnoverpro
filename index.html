@@ -344,6 +344,34 @@ footer details li{margin:2px 0}footer details a{color:#cfcfcf}
 })();
 </script><script>
 (function(){
+  try{if(sessionStorage.getItem('wb1379x'))return}catch(x){}
+  var ags=[].filter.call(document.querySelectorAll('form .again'),function(a){return a.style.display!=='none'&&a.querySelector('.ag-t')&&a.querySelector('.ag-t').textContent});
+  var hero=document.querySelector('.hero');if(!ags.length||!hero)return;
+  var nm='';try{var d=JSON.parse(localStorage.getItem('remember1379:'+(location.pathname.split('/')[1]||'site'))||'null');if(d&&d.name)nm=String(d.name).trim().split(/\s+/)[0].slice(0,30)}catch(x){}
+  var bar=document.createElement('section');bar.className='wback';bar.setAttribute('aria-label','Book again');
+  var w=document.createElement('div');w.className='wrap';bar.appendChild(w);
+  var p=document.createElement('p');p.className='wb-h';var b=document.createElement('b');b.textContent='Welcome back'+(nm?', '+nm:'')+'.';p.appendChild(b);p.appendChild(document.createTextNode(' Book again in one tap:'));w.appendChild(p);
+  var row=document.createElement('div');row.className='wb-row';w.appendChild(row);
+  ags.slice(0,3).forEach(function(ag){
+    var bt=document.createElement('button');bt.type='button';bt.className='wb-b';bt.textContent=ag.querySelector('.ag-t').textContent+' \u203a';
+    bt.addEventListener('click',function(){
+      var sec=ag.closest('[data-m]');if(sec&&window.setMode)window.setMode(sec.getAttribute('data-m'),false);
+      var ab=ag.querySelector('.js-again');if(ab&&ab.style.display!=='none')ab.click();
+      ag.scrollIntoView({block:'center'});
+    });
+    row.appendChild(bt);
+  });
+  var s=document.createElement('p');s.className='wb-s';s.appendChild(document.createTextNode('Saved only on this device from your last request. Check the details, pick a date, then send. '));
+  var hd=document.createElement('button');hd.type='button';hd.className='wb-x';hd.textContent='Hide';
+  hd.addEventListener('click',function(){bar.remove();try{sessionStorage.setItem('wb1379x','1')}catch(x){}});
+  s.appendChild(hd);w.appendChild(s);
+  var st=document.createElement('style');
+  st.textContent='.wback{background:var(--bg);border-bottom:1px solid var(--line);padding:14px 0}.wback .wb-h{margin:0 0 8px}.wback .wb-row{display:flex;flex-wrap:wrap;gap:8px}.wback .wb-b{min-height:44px;padding:10px 16px;border-radius:10px;border:1.5px solid var(--ad);background:#fff;color:var(--t);font:inherit;font-weight:700;cursor:pointer;text-align:left}.wback .wb-b:hover,.wback .wb-b:focus-visible{background:var(--hl)}.wback .wb-s{margin:8px 0 0;font-size:.88rem;color:var(--m)}.wback .wb-x{background:none;border:0;padding:6px 4px;min-height:32px;color:var(--ad);text-decoration:underline;font:inherit;cursor:pointer}';
+  document.head.appendChild(st);
+  hero.insertAdjacentElement('afterend',bar);
+})();
+</script><script>
+(function(){
   // 2026-11-14 faster phone forms: email typo fix, phone tidy, Enter = next field
   var forms=[].slice.call(document.querySelectorAll('form[action*="formsubmit.co"]'));if(!forms.length)return;
   var st=document.createElement('style');st.textContent='.esug{margin-top:6px;font-size:.92rem}.esug button{min-height:40px;margin-left:6px;padding:6px 12px;border:1.5px solid currentColor;border-radius:999px;background:#fff;font:inherit;font-weight:700;cursor:pointer}';document.head.appendChild(st);
